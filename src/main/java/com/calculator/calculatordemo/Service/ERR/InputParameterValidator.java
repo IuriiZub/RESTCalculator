@@ -13,7 +13,7 @@ import java.io.IOException;
 public class InputParameterValidator implements ParameterValidator {
     @Override
     public CalculationDataDTO validateParameters(String jsonString) throws IOException, IncorrectInputDataTypeException {
-        System.out.println("json string val= " + jsonString);
+
         String firstElementKey = "firstElement";
         String secondElementKey = "secondElement";
 

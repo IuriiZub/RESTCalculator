@@ -146,8 +146,6 @@ public class CalculatorControllerTest {
         ResponseEntity<Object> responseEntity =
                 restTemplate.postForEntity(new URI(baseUrl + localPort + "/api/divide/"), request, Object.class);
 
-        System.out.println(" responce = " + responseEntity.getHeaders());
-        System.out.println(" responce = " + responseEntity.getBody());
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertEquals(error, responseEntity.getBody().toString());
     }
