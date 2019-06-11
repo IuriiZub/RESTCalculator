@@ -26,13 +26,13 @@ import java.io.IOException;
 @CrossOrigin
 public class CalculatorController {
 
-    final HttpHeaders httpHeaders = new HttpHeaders();
+    private final HttpHeaders httpHeaders = new HttpHeaders();
 
     @Autowired
-    ApplicationContext applicationContext;
+    private ApplicationContext applicationContext;
 
     @Autowired
-    ParameterValidator inputValidator;
+    private ParameterValidator inputValidator;
 
     CalculatorController() {
 
@@ -85,28 +85,28 @@ public class CalculatorController {
     @ExceptionHandler
     public final ResponseEntity<ErrorData> handleDivisionException(DivisionException ex) {
 
-        ErrorData errorDetails = new ErrorData(ex.getMessage());
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+        ErrorData errorData = new ErrorData(ex.getMessage());
+        return new ResponseEntity<>(errorData, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public final ResponseEntity<ErrorData> handleIncorrectInputDataException(IncorrectInputDataTypeException ex) {
 
-        ErrorData errorDetails = new ErrorData(ex.getMessage());
-        return new ResponseEntity(errorDetails, HttpStatus.BAD_REQUEST);
+        ErrorData errorData = new ErrorData(ex.getMessage());
+        return new ResponseEntity(errorData, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorData> handleIoException(IOException e) {
-        ErrorData error = new ErrorData("Incorrect input! " + e.getMessage());
-        return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+        ErrorData errorData = new ErrorData("Incorrect input! " + e.getMessage());
+        return new ResponseEntity(errorData, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorData> handleException(Exception e) {
 
-        ErrorData error = new ErrorData(e.getMessage());
-        return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+        ErrorData errorData = new ErrorData(e.getMessage());
+        return new ResponseEntity(errorData, HttpStatus.BAD_REQUEST);
     }
 }
 

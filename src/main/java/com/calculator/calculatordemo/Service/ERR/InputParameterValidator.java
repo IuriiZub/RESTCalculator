@@ -3,8 +3,6 @@ package com.calculator.calculatordemo.Service.ERR;
 import com.calculator.calculatordemo.Service.DTO.CalculationDataDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;

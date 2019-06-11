@@ -4,6 +4,7 @@ package com.calculator.calculatordemo.Service.ERR;
  * Created by Yurii on 6/8/2019.
  */
 public class ErrorData {
+
     private String error;
 
     public ErrorData(String error) {
