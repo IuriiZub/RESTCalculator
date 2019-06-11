@@ -2,20 +2,20 @@ package com.calculator.calculatordemo.controller;
 
 import com.calculator.calculatordemo.Service.DTO.CalculationDataDTO;
 
-import com.calculator.calculatordemo.Service.ERR.DivisionException;
-import com.calculator.calculatordemo.Service.ERR.ErrorData;
+import com.calculator.calculatordemo.Service.ERR.*;
 import com.calculator.calculatordemo.Service.calculator.*;
 import com.calculator.calculatordemo.model.CalculationResult;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 
-import javax.validation.Valid;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 
 /**
@@ -27,64 +27,86 @@ import javax.validation.Valid;
 public class CalculatorController {
 
     final HttpHeaders httpHeaders = new HttpHeaders();
-    AnnotationConfigApplicationContext applicationContext;
-    Calculator calculator;
 
+    @Autowired
+    ApplicationContext applicationContext;
+
+    @Autowired
+    ParameterValidator inputValidator;
+
+    CalculatorController() {
+
+    }
 
     @RequestMapping(value = "/plus", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<CalculationResult> addData(@Valid @RequestBody CalculationDataDTO inputData) {
-        applicationContext =
-                new AnnotationConfigApplicationContext("com.calculator.calculatordemo");
-        calculator = applicationContext.getBean(CalculatorAddictor.class);
+    public ResponseEntity<CalculationResult> addData(@RequestBody String calculationJsonDTO)
+            throws IOException, IncorrectInputDataTypeException {
+
+        CalculationDataDTO inputData = inputValidator.validateParameters(calculationJsonDTO);
+        Calculator calculator = applicationContext.getBean(CalculatorAddictor.class);
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity(calculator.calculate(inputData), httpHeaders, HttpStatus.OK);
     }
 
-
     @RequestMapping(value = "/minus", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<CalculationResult> deductData(@Valid @RequestBody CalculationDataDTO inputData) throws DivisionException {
-        applicationContext =
-                new AnnotationConfigApplicationContext("com.calculator.calculatordemo");
-        calculator = applicationContext.getBean(CalculatorDeductor.class);
+    public ResponseEntity<CalculationResult> deductData(@RequestBody String calculationJsonDTO)
+            throws IOException, IncorrectInputDataTypeException {
+
+        CalculationDataDTO inputData = inputValidator.validateParameters(calculationJsonDTO);
+        Calculator calculator = applicationContext.getBean(CalculatorDeductor.class);
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity(calculator.calculate(inputData), httpHeaders, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/multiply", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<CalculationResult> multiplyData(@Valid @RequestBody CalculationDataDTO inputData) throws DivisionException {
-        applicationContext =
-                new AnnotationConfigApplicationContext("com.calculator.calculatordemo");
-        calculator = applicationContext.getBean(CalculatorMultipliyer.class);
+    public ResponseEntity<CalculationResult> multiplyData(@RequestBody String calculationJsonDTO)
+            throws IOException, IncorrectInputDataTypeException {
+
+        CalculationDataDTO inputData = inputValidator.validateParameters(calculationJsonDTO);
+        Calculator calculator = applicationContext.getBean(CalculatorMultipliyer.class);
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity(calculator.calculate(inputData), httpHeaders, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/divide", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseEntity<CalculationResult> divideData(@Valid @RequestBody CalculationDataDTO inputData) {
-        applicationContext =
-                new AnnotationConfigApplicationContext("com.calculator.calculatordemo");
-        calculator = applicationContext.getBean(CalculatorDivider.class);
+    public ResponseEntity<CalculationResult> divideData(@RequestBody String calculationJsonDTO)
+            throws IOException, IncorrectInputDataTypeException, DivisionException {
+
+        CalculationDataDTO inputData = inputValidator.validateParameters(calculationJsonDTO);
+        Calculator calculator = applicationContext.getBean(CalculatorDivider.class);
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         return new ResponseEntity(calculator.calculate(inputData), httpHeaders, HttpStatus.OK);
     }
 
     @ExceptionHandler
-    public final ResponseEntity<ErrorData> handleUserNotFoundException(DivisionException ex, WebRequest request) {
+    public final ResponseEntity<ErrorData> handleDivisionException(DivisionException ex) {
+
         ErrorData errorDetails = new ErrorData(ex.getMessage());
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorData> handleException(HttpMessageNotReadableException e, WebRequest request) {
-        e.printStackTrace();
-        ErrorData error = new ErrorData(e.getMessage());
+    public final ResponseEntity<ErrorData> handleIncorrectInputDataException(IncorrectInputDataTypeException ex) {
+
+        ErrorData errorDetails = new ErrorData(ex.getMessage());
+        return new ResponseEntity(errorDetails, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorData> handleIoException(IOException e) {
+        ErrorData error = new ErrorData("Incorrect input! " + e.getMessage());
         return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<ErrorData> handleException(Exception e) {
 
+        ErrorData error = new ErrorData(e.getMessage());
+        return new ResponseEntity(error, HttpStatus.BAD_REQUEST);
+    }
 }
 
